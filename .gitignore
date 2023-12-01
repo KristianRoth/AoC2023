@@ -1,2 +1,3 @@
-*.dSYM
+*.dSYM/
+.vscode/
 aoc
