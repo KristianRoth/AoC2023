@@ -42,3 +42,23 @@ int Common_string_has_suffix(const char *str, const char *suf) {
     }
     return b == suf && *a == *b;
 }
+
+void Common_strip_string(char **str, char *suf) {
+    *str = *str + strlen(suf);
+}
+
+int Common_get_number(char **str) {
+    int num = atoi(*str);
+    *str = *str + snprintf(NULL, 0, "%d", num);
+    return num;
+}
+
+int Common_count_occurances(const char *str, char c) {
+    int occ = 0;
+    for (int i = 0; str[i] != '\n'; i++) {
+        if (str[i] == c) {
+            occ++;
+        }
+    }
+    return occ;
+}
