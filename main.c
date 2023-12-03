@@ -3,10 +3,12 @@
 #include <stdlib.h>
 #include "AoC1/aoc1.h"
 #include "AoC2/aoc2.h"
+#include "AoC3/aoc3.h"
 
 void (*day_solves[])(void) = {
     Day1_solve,
     Day2_solve,
+    Day3_solve,
 };
 
 int main(int argc, char *argv[]) {
