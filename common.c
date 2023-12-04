@@ -61,10 +61,11 @@ int Common_get_number_lstrip(char **str) {
 
 int Common_count_occurances(const char *str, char c) {
     int occ = 0;
-    for (int i = 0; str[i] != '\n'; i++) {
-        if (str[i] == c) {
+    while (*str != '\0') {
+        if (*str == c) {
             occ++;
         }
+        str++;
     }
     return occ;
 }
