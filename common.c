@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 Node *Common_readFile(const char* path) {
     FILE *inputFile;
@@ -51,6 +52,11 @@ int Common_get_number(char **str) {
     int num = atoi(*str);
     *str = *str + snprintf(NULL, 0, "%d", num);
     return num;
+}
+
+int Common_get_number_lstrip(char **str) {
+    while (!isdigit(**str)) { (*str)++; }
+    return Common_get_number(str);
 }
 
 int Common_count_occurances(const char *str, char c) {
