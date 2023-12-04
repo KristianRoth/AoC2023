@@ -10,42 +10,31 @@
 CardNode *parse_cards(Node *head) {
     CardNode *cards = malloc(sizeof(CardNode));
     CardNode *tail = cards;
+    char is_winner[100];
     do {
         char *value = head->value;
-        Card *card = malloc(sizeof(Card));
+        memset(is_winner, 0, sizeof(is_winner));
         Common_strip_string(&value, "Card XXX: ");
         for (int i = 0; i < WINNING_AMOUNT; i++) {
-            card->winning[i] = Common_get_number_lstrip(&value);
+            is_winner[Common_get_number_lstrip(&value)]++;
         }
         Common_strip_string(&value, " | ");
+        int winners = 0;
         for (int i = 0; i < NUMBERS_AMOUNT; i++) {
-            card->numbers[i] = Common_get_number_lstrip(&value);
+            winners += is_winner[Common_get_number_lstrip(&value)];
         }
         CardNode *new = malloc(sizeof(CardNode));
-        new->card = card;
+        new->winners = winners;
         tail->next = new;
         tail = new;
     } while (head = head->next);
     return cards->next;
 }
 
-int count_winners(Card *card) {
-    int winners = 0;
-    for (int i = 0; i < WINNING_AMOUNT; i++) {
-        for (int j = 0; j < NUMBERS_AMOUNT; j++) {
-            if (card->winning[i] == card->numbers[j]) {
-                winners++;
-                break;
-            }
-        }
-    }
-    return winners;
-}
-
 int sum_winners(CardNode *cards) {
     int sum = 0;
     do {
-        sum += pow(2, count_winners(cards->card)-1);
+        sum += pow(2, cards->winners-1);
     } while (cards = cards->next);
     return sum;
 }
@@ -54,12 +43,11 @@ int sum_copy_winners(CardNode *cards) {
     int sum = 0;
     int cw = WINNING_AMOUNT+1;
     int copies[cw];
-    memset(copies, 0, cw*sizeof(int));
+    memset(copies, 0, sizeof(copies));
     int start = 0;
     do {
-        int winners = count_winners(cards->card);
         int card_copies = copies[start%cw] + 1;
-        for (int i = 0; i < winners; i++) {
+        for (int i = 0; i < cards->winners; i++) {
             copies[(start+i+1)%cw] += card_copies;
         }
         sum += card_copies;
