@@ -6,7 +6,7 @@ import timeit
 
 content = [
   '# 🎄 Advent of Code 2023 🎄',
-  'Solutions for [Advent of Code 2023](https://adventofcode.com/2023). This years objective is to write performance optimized C code.',
+  'Solutions for [Advent of Code 2023](https://adventofcode.com/2023). This years objective is to write somewhat performant C code.',
   '## Usage',
   '```make && ./aoc [day_number] [performance_amount]```',
   '## Solution info for days'

@@ -59,6 +59,18 @@ int Common_get_number_lstrip(char **str) {
     return Common_get_number(str);
 }
 
+unsigned long Common_get_number_ul(char **str) {
+    char *end;
+    unsigned long num = strtoul(*str, &end, 10);
+    *str = end;
+    return num;
+}
+
+unsigned long Common_get_number_lstrip_ul(char **str) {
+    while (!isdigit(**str)) { (*str)++; }
+    return Common_get_number_ul(str);
+}
+
 int Common_count_occurances(const char *str, char c) {
     int occ = 0;
     while (*str != '\0') {
