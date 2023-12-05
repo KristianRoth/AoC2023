@@ -65,70 +65,44 @@ unsigned long map(MapNode *map, unsigned long val) {
     return val;
 }
 
-Range *map_range(MapNode *map, Range *r) {
+void map_range(MapNode *map, Range *r) {
     MapNode *map_head = map;
-    Range *mapped = malloc(sizeof(Range));
-    Range *head = mapped;
     do {
-        printf("\nSTART %lu <-> %lu has next -> %p\n", r->start, r->end, r->next);
         do {
-            printf("loop %lu <-> %lu mapr %lu <-> %lu\n", r->start, r->end, map->source, map->source + map->range);
             if (r->start < map->source) {
-                Range *new = malloc(sizeof(Range));
-                new->start = r->start;
                 if (r->end <= map->source) {
-                    printf("strait %lu <-> %lu\n", r->start, r->end);
-
-                    new->end = r->end;
-                    mapped->next = new;
-                    mapped = mapped->next;
                     break;
                 } else {
-                    new->end = map->source - 1;
-                    Range *next = malloc(sizeof(Range));
-                    next->start = map->source;
-                    next->end = r->end;
-                    printf("split %lu <-> %lu, %lu <-> %lu\n", new->start, new->end, next->start, next->end);
-                    new->next = map_range(map_head, next);
-                    mapped->next = new;
-                    while (mapped->next) { mapped = mapped->next; };
+                    Range *new = malloc(sizeof(Range));
+                    new->start = map->source;
+                    new->end   = r->end;
+                    new->next  = r->next;
+
+                    r->end  = map->source - 1;
+                    r->next = new;
                     break;
                 }
             }
             if (r->start < map->source + map->range) {
-                Range *new = malloc(sizeof(Range));
-                new->start = map->dest + r->start - map->source;
                 if (r->end <= map->source + map->range) {
-                    new->end = map->dest + r->end - map->source;
-                    printf("map %lu <-> %lu to %lu <-> %lu\n", r->start, r->end, new->start, new->end);
-                    mapped->next = new;
-                    mapped = mapped->next;
+                    r->start = map->dest + r->start - map->source;
+                    r->end   = map->dest + r->end   - map->source;
                     break;
                 } else {
-                    new->end = map->dest + map->range - 1;
-                    Range *next = malloc(sizeof(Range));
-                    next->start = map->source + map->range;
-                    next->end = r->end;
-                    printf("map split %lu <-> %lu, %lu <-> %lu\n", new->start, new->end, next->start, next->end);
-                    new->next = map_range(map_head, next);
-                    mapped->next = new;
-                    while (mapped->next) { mapped = mapped->next; };
+                    Range *new = malloc(sizeof(Range));
+                    new->start = map->source + map->range;
+                    new->end   = r->end;
+                    new->next  = r->next;
+
+                    r->start = map->dest + r->start - map->source;
+                    r->end   = map->dest + map->range - 1;
+                    r->next  = new;
                     break;
                 }
-            }
-            if (map->next == NULL) {
-                printf("end %lu <-> %lu, %p\n", r->start, r->end, map->next);
-                Range *new = malloc(sizeof(Range));
-                new->start = r->start;
-                new->end = r->end;
-                mapped->next = new;
-                mapped = mapped->next;
             }
         } while (map = map->next);
         map = map_head;
     } while (r = r->next);
-    printf("END\n");
-    return head->next;
 }
 
 unsigned long get_min(Range *r) {
@@ -182,16 +156,15 @@ void Day5_solve() {
         seeds_ranges = new;
     }
 
-    Range *soils = map_range(seed_to_soil, seeds_ranges);
-    Range *ferts = map_range(soil_to_fert, soils);
-    Range *waters = map_range(fert_to_water, ferts);
-    Range *lights = map_range(water_to_light, waters);
-    Range *temps = map_range(light_to_temp, lights);
-    Range *humis = map_range(temp_to_humi, temps);
-    Range *locs = map_range(humi_to_loc, humis);
+    map_range(seed_to_soil,   seeds_ranges);
+    map_range(soil_to_fert,   seeds_ranges);
+    map_range(fert_to_water,  seeds_ranges);
+    map_range(water_to_light, seeds_ranges);
+    map_range(light_to_temp,  seeds_ranges);
+    map_range(temp_to_humi,   seeds_ranges);
+    map_range(humi_to_loc,    seeds_ranges);
 
-
-    unsigned long min_loc_range = get_min(locs);
+    unsigned long min_loc_range = get_min(seeds_ranges);
 
     printf("Answer 1st: %lu\n", min_loc);
     printf("Answer 2nd: %lu\n", min_loc_range);
