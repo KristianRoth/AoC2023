@@ -7,4 +7,5 @@ build:
 	AoC3/aoc3.c \
 	AoC4/aoc4.c \
 	AoC5/aoc5.c \
+	AoC6/aoc6.c \
 	-o aoc
