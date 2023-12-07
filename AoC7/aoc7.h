@@ -14,6 +14,7 @@ struct Hand {
     int bid;
     int rank_count;
     int j_count;
+    long score;
     Rank *ranks;
     Hand *next;
 };

@@ -16,5 +16,7 @@ int Common_get_number_lstrip(char **str);
 int Common_count_occurances(const char *str, char c);
 unsigned long Common_get_number_ul(char **str);
 unsigned long Common_get_number_lstrip_ul(char **str);
+long Common_concatenate(long x, long y);
+
 
 #endif // COMMON_H

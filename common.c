@@ -81,3 +81,11 @@ int Common_count_occurances(const char *str, char c) {
     }
     return occ;
 }
+
+long Common_concatenate(long x, long y) {
+    long pow = 10;
+    while(y >= pow) {
+        pow *= 10;
+    }
+    return x * pow + y;
+}

@@ -60,30 +60,57 @@ Hand *parse_hands(Node *head) {
 }
 
 int card_to_int(char c) {
-    return  c == 'A' ? 14 :
-            c == 'K' ? 13 :
-            c == 'Q' ? 12 :
-            c == 'J' ? 11 :
-            c == 'T' ? 10 :
-            c - 48;
+    return  c == 'A' ? 14+48 :
+            c == 'K' ? 13+48 :
+            c == 'Q' ? 12+48 :
+            c == 'J' ? 11+48 :
+            c == 'T' ? 10+48 :
+            c;
 }
 
-bool compare_hands(Hand *a, Hand *b) {
-    if (a->rank_count != b->rank_count) {
-        return a->rank_count < b->rank_count;
-    }
-    if (a->ranks->count != b->ranks->count) {
-        return a->ranks->count > b->ranks->count;
-    }
-    if (a->ranks->next->count != b->ranks->next->count) {
-        return a->ranks->next->count > b->ranks->next->count;
-    }
-    for (int i = 0; i < 5; i++) {
-        if (a->cards[i] != b->cards[i]) {
-            return card_to_int(a->cards[i]) > card_to_int(b->cards[i]);
+int card_to_int_j(char c) {
+    return  c == 'A' ? 14+48 :
+            c == 'K' ? 13+48 :
+            c == 'Q' ? 12+48 :
+            c == 'J' ? 1+48 :
+            c == 'T' ? 10+48 :
+            c;
+}
+
+void count_scores(Hand *a) {
+    do {
+        long long score = 0;
+        Rank *r = a->ranks;
+        for (int i = 0; i < 5; i++) {
+            score = Common_concatenate(score, r != NULL ? r->count : 0);
+            r = r != NULL ? r->next : NULL;
         }
-    }
-    return true;
+        for (int i = 0; i < 5; i++) {
+            score = Common_concatenate(score, card_to_int(a->cards[i]));
+        }
+
+        a->score = score;
+    } while (a = a->next);
+}
+
+void count_scores_j(Hand *a) {
+    do {
+        long long score = 0;
+        Rank *r = a->ranks;
+
+        bool first = true;
+        for (int i = 0; i < 5; i++) {
+            score = Common_concatenate(score, r != NULL ? r->count+a->j_count : a->j_count);
+            a->j_count = 0;
+            r = r != NULL ? r->next : NULL;
+        }
+
+        for (int i = 0; i < 5; i++) {
+            score = Common_concatenate(score, card_to_int_j(a->cards[i]));
+        }
+
+        a->score = score;
+    } while (a = a->next);
 }
 
 void prepare_j(Hand *h) {
@@ -104,31 +131,37 @@ void prepare_j(Hand *h) {
     } while (h = h->next);
 }
 
-int card_to_int_j(char c) {
-    return  c == 'A' ? 14 :
-            c == 'K' ? 13 :
-            c == 'Q' ? 12 :
-            c == 'J' ? 1 :
-            c == 'T' ? 10 :
-            c - 48;
+Hand *sorted_merge(Hand *a, Hand *b) {
+    Hand *result = NULL;
+    if (a == NULL) return b;
+    if (b == NULL) return a;
+
+    if (a->score <= b->score) {
+        result = a;
+        result->next = sorted_merge(a->next, b);
+    } else {
+        result = b;
+        result->next = sorted_merge(a, b->next);
+    }
+    return result;
 }
 
-bool compare_hands_j(Hand *a, Hand *b) {
-    if (a->rank_count != b->rank_count) {
-        return a->rank_count < b->rank_count;
+Hand *merge_sort(Hand *head) {
+    if (head == NULL || head->next == NULL) return head;
+    Hand *fast = head;
+    Hand *slow = head;
+    while (1) {
+        if (fast->next == NULL) break;
+        fast = fast->next;
+        if (fast->next == NULL) break;
+        fast = fast->next;
+        slow = slow->next;
     }
-    if (a->rank_count > 0 && a->j_count != 5 && (a->ranks->count + a->j_count != b->ranks->count + b->j_count)) {
-        return a->ranks->count + a->j_count > b->ranks->count + b->j_count;
-    }
-    if (a->rank_count > 1 && (a->ranks->next->count != b->ranks->next->count)) {
-        return a->ranks->next->count > b->ranks->next->count;
-    }
-    for (int i = 0; i < 5; i++) {
-        if (a->cards[i] != b->cards[i]) {
-            return card_to_int_j(a->cards[i]) > card_to_int_j(b->cards[i]);
-        }
-    }
-    return true;
+    Hand *a = slow->next;
+    slow->next = NULL;
+    a = merge_sort(a);
+    Hand *b = merge_sort(head);
+    return sorted_merge(a, b);
 }
 
 
@@ -136,22 +169,10 @@ void Day7_solve() {
     Node *head = Common_readFile("AoC7/day7.txt");
     Hand *hands = parse_hands(head);
 
-    Hand *sorted = NULL;
-    while (hands != NULL) {
-        Hand *next = hands->next;
-        if (sorted == NULL || compare_hands(sorted, hands)) {
-            hands->next = sorted;
-            sorted = hands;
-        } else {
-            Hand *find = sorted;
-            while (find->next != NULL && compare_hands(hands, find->next)) find = find->next;
-            hands->next = find->next;
-            find->next = hands;
-        }
-        hands = next;
-    }
-    hands = sorted;
+    count_scores(hands);
 
+    Hand *sorted = merge_sort(hands);
+    hands = sorted;
     int sum = 0;
     int index = 1;
     do {
@@ -159,22 +180,10 @@ void Day7_solve() {
     } while (sorted = sorted->next);
 
     prepare_j(hands);
+    count_scores_j(hands);
 
-    sorted = NULL;
-    while (hands != NULL) {
-        Hand *next = hands->next;
-        if (sorted == NULL || compare_hands_j(sorted, hands)) {
-            hands->next = sorted;
-            sorted = hands;
-        } else {
-            Hand *find = sorted;
-            while (find->next != NULL && compare_hands_j(hands, find->next)) find = find->next;
-            hands->next = find->next;
-            find->next = hands;
-        }
-        hands = next;
-    }
-    hands = sorted;
+    sorted = merge_sort(hands);
+
 
     int sum_j = 0;
     int index_j = 1;
