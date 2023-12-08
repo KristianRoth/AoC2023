@@ -26,45 +26,56 @@ MapTree *find_ends_a(MapTree *map) {
     return found;
 }
 
-MapTree *parse_map_tree(Node *head) {
-    MapTree *map = NULL;
+HashMap *parse_map_tree(Node *head, Node **starts_a) {
+    HashMap *hm = Common_hash_create(1000, &Common_hash_string);
+    Node *names = NULL;
+    Node *as = NULL;
     do {
         MapTree *new = malloc(sizeof(MapTree));
+        Node *list = malloc(sizeof(Node));
         memcpy(new->name, head->value, 3);
         memcpy(new->left_name, head->value + 7, 3);
         memcpy(new->right_name, head->value + 12, 3);
-        new->next = map;
-        map = new;
+        Common_hash_put(hm, new->name, new);
+        list->value = new->name;
+        list->next = names;
+        names = list;
+        if (new->name[2] == 'A') {
+            Node *a = malloc(sizeof(Node));
+            a->next = as;
+            a->value = new->name;
+            as = a;
+        }
     } while (head = head->next);
-    MapTree *map_head = map;
+    *starts_a = as;
     do {
-        map->left  = find_name(map_head, map->left_name);
-        map->right = find_name(map_head, map->right_name);
-    } while (map = map->next);
+        MapTree *map = Common_hash_get(hm, names->value);
+        map->left  = (MapTree*)Common_hash_get(hm, map->left_name);
+        map->right = (MapTree*)Common_hash_get(hm, map->right_name);
+    } while (names = names->next);
 
-    return map_head;
+    return hm;
 }
 
 void Day8_solve() {
     Node *head = Common_readFile("AoC8/day8.txt");
     char *dirs = head->value;
     int dirs_len = strlen(dirs);
-    MapTree *map = parse_map_tree(head->next->next);
-    int count = 0;
+    Node *starts_a;
+    HashMap *hm = parse_map_tree(head->next->next, &starts_a);
 
-    MapTree *walk = find_name(map, "AAA");
+    int count = 0;
+    MapTree *walk = Common_hash_get(hm, "AAA");
     while (strcmp(walk->name, "ZZZ") != 0) walk = dirs[count++%dirs_len] == 'L' ? walk->left : walk->right;
 
-    MapTree *walks = find_ends_a(map);
-    MapTree *w_len = walks;
+    Node *starts_a_len = starts_a;
     int STARTS_A_COUNT = 1;
-    while (w_len = w_len->next) STARTS_A_COUNT++;
-
+    while (starts_a_len = starts_a_len->next) STARTS_A_COUNT++;
 
     MapTree *walks_array[STARTS_A_COUNT];
     for (int i = 0; i < STARTS_A_COUNT; i++) {
-        walks_array[i] = walks;
-        walks = walks->next;
+        walks_array[i] = Common_hash_get(hm, starts_a->value);
+        starts_a = starts_a->next;
     }
 
     int cycles[STARTS_A_COUNT];

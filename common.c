@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "AoC8/aoc8.h"
 
 Node *Common_readFile(const char* path) {
     FILE *inputFile;
@@ -101,4 +102,47 @@ long Common_gcd(long x, long y) {
         x = t;
     }
     return x;
+}
+
+HashMap *Common_hash_create(int bucket_count, int (*hash_fn)(char*)) {
+    HashMap *hm = malloc(sizeof(int) + sizeof(void*) + sizeof(void*)*bucket_count);
+    hm->bucket_count = bucket_count;
+    hm->hash_fn = hash_fn;
+    memset(&hm->buckets, 0, sizeof(void*)*bucket_count);
+    return hm;
+}
+
+void Common_hash_put(HashMap *hm, char *key, void *data) {
+    int hash = hm->hash_fn(key)%hm->bucket_count;
+    HashNode *new = malloc(sizeof(HashNode));
+    new->key  = key;
+    new->data = data;
+    new->next = hm->buckets[hash];
+    hm->buckets[hash] = new;
+}
+
+void *Common_hash_get(HashMap *hm, char *key) {
+    int hash = hm->hash_fn(key)%hm->bucket_count;
+    HashNode *bucket = hm->buckets[hash];
+    while (bucket != NULL && strcmp(bucket->key, key)) bucket = bucket->next;
+    return bucket != NULL ? bucket->data : NULL;
+}
+
+int Common_hash_string(char *str) {
+    int a = 112241;
+    while (str != str + strlen(str)) a += (a << 5) + a + *(str++);
+    return a;
+}
+
+void Common_hash_print(HashMap *hm) {
+    for (int i = 0; i < hm->bucket_count; i++) {
+        printf("%i: ", i+1);
+        if (hm->buckets[i] != NULL) {
+            HashNode *a = hm->buckets[i];
+            do {
+                printf(" -> %s", ((MapTree*)a->data)->name);
+            } while(a = a->next);
+        }
+        printf("\n");
+    }
 }
