@@ -9,4 +9,5 @@ build:
 	AoC5/aoc5.c \
 	AoC6/aoc6.c \
 	AoC7/aoc7.c \
+	AoC8/aoc8.c \
 	-o aoc

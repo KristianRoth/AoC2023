@@ -15,7 +15,7 @@ Node *Common_readFile(const char* path) {
     Node *prev = malloc(sizeof(Node));
     Node *head = prev;
     Node *next;
-    char buff[256];
+    char buff[512];
     size_t len = 0;
     ssize_t read;
 
@@ -88,4 +88,17 @@ long Common_concatenate(long x, long y) {
         pow *= 10;
     }
     return x * pow + y;
+}
+
+long Common_lcm(long x, long y) {
+    return x*y/Common_gcd(x, y);
+}
+
+long Common_gcd(long x, long y) {
+    while (y != 0) {
+        int t = y;
+        y = x%y;
+        x = t;
+    }
+    return x;
 }
