@@ -8,24 +8,6 @@
 #include <math.h>
 #include <limits.h>
 
-MapTree *find_name(MapTree *map, char* name) {
-    while (strcmp(map->name, name) != 0) map = map->next;
-    return map;
-}
-
-MapTree *find_ends_a(MapTree *map) {
-    MapTree *found = NULL;
-    while (map) {
-        MapTree *next = map->next;
-        if (map->name[2] == 'A') {
-            map->next = found;
-            found = map;
-        }
-        map = next;
-    }
-    return found;
-}
-
 HashMap *parse_map_tree(Node *head, Node **starts_a) {
     HashMap *hm = Common_hash_create(1000, &Common_hash_string);
     Node *names = NULL;
@@ -66,7 +48,8 @@ void Day8_solve() {
 
     int count = 0;
     MapTree *walk = Common_hash_get(hm, "AAA");
-    while (strcmp(walk->name, "ZZZ") != 0) walk = dirs[count++%dirs_len] == 'L' ? walk->left : walk->right;
+    while (strcmp(walk->name, "ZZZ") != 0)
+        walk = dirs[count++%dirs_len] == 'L' ? walk->left : walk->right;
 
     Node *starts_a_len = starts_a;
     int STARTS_A_COUNT = 1;
@@ -81,13 +64,11 @@ void Day8_solve() {
     int cycles[STARTS_A_COUNT];
     for (int i = 0; i < STARTS_A_COUNT; i++) {
         int count_w = 0;
-        while (true) {
-            walks_array[i] = dirs[count_w++%dirs_len] == 'L' ? walks_array[i]->left : walks_array[i]->right;
-            if (walks_array[i]->name[2] == 'Z') {
-                cycles[i] = count_w ;
-                break;
-            }
-        }
+        while (walks_array[i]->name[2] != 'Z')
+            walks_array[i] = dirs[count_w++%dirs_len] == 'L'
+                ? walks_array[i]->left
+                : walks_array[i]->right;
+        cycles[i] = count_w;
     }
 
     long iterations = cycles[0];

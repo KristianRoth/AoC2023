@@ -8,7 +8,6 @@ struct MapTree {
     char left_name[3];
     MapTree *right;
     char right_name[3];
-    MapTree *next;
 };
 
 void Day8_solve(void);

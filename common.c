@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "AoC8/aoc8.h"
 
 Node *Common_readFile(const char* path) {
     FILE *inputFile;
@@ -132,17 +131,4 @@ int Common_hash_string(char *str) {
     int a = 112241;
     while (str != str + strlen(str)) a += (a << 5) + a + *(str++);
     return a;
-}
-
-void Common_hash_print(HashMap *hm) {
-    for (int i = 0; i < hm->bucket_count; i++) {
-        printf("%i: ", i+1);
-        if (hm->buckets[i] != NULL) {
-            HashNode *a = hm->buckets[i];
-            do {
-                printf(" -> %s", ((MapTree*)a->data)->name);
-            } while(a = a->next);
-        }
-        printf("\n");
-    }
 }

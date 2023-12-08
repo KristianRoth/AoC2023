@@ -37,6 +37,5 @@ HashMap *Common_hash_create(int bucket_count, int (*hash_fn)(char*));
 void Common_hash_put(HashMap *hm, char *key, void *data);
 void *Common_hash_get(HashMap *hm, char *key);
 int Common_hash_string(char *str);
-void Common_hash_print(HashMap *hm);
 
 #endif // COMMON_H

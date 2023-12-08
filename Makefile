@@ -1,5 +1,6 @@
 build:
 	gcc-13 -fexec-charset=UTF-8 \
+	-O3 \
 	main.c \
 	common.c \
 	AoC1/aoc1.c \
