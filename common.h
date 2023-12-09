@@ -7,6 +7,13 @@ struct Node {
     Node *next;
 };
 
+
+typedef struct IntNode IntNode;
+struct IntNode {
+    int value;
+    IntNode *next;
+};
+
 typedef struct HashNode HashNode;
 struct HashNode {
     char* key;
@@ -37,5 +44,7 @@ HashMap *Common_hash_create(int bucket_count, int (*hash_fn)(char*));
 void Common_hash_put(HashMap *hm, char *key, void *data);
 void *Common_hash_get(HashMap *hm, char *key);
 int Common_hash_string(char *str);
+void Common_int_node_print(IntNode *head, char *prefix);
+
 
 #endif // COMMON_H

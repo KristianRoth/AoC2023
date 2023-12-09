@@ -11,6 +11,7 @@
 #include "AoC6/aoc6.h"
 #include "AoC7/aoc7.h"
 #include "AoC8/aoc8.h"
+#include "AoC9/aoc9.h"
 
 void (*day_solves[])(void) = {
     Day1_solve,
@@ -21,6 +22,7 @@ void (*day_solves[])(void) = {
     Day6_solve,
     Day7_solve,
     Day8_solve,
+    Day9_solve,
 };
 
 int main(int argc, char *argv[]) {

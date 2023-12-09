@@ -55,7 +55,7 @@ int Common_get_number(char **str) {
 }
 
 int Common_get_number_lstrip(char **str) {
-    while (!isdigit(**str)) { (*str)++; }
+    while (!isdigit(**str) && **str != '-') { (*str)++; }
     return Common_get_number(str);
 }
 
@@ -131,4 +131,14 @@ int Common_hash_string(char *str) {
     int a = 112241;
     while (str != str + strlen(str)) a += (a << 5) + a + *(str++);
     return a;
+}
+
+void Common_int_node_print(IntNode *head, char *prefix) {
+    printf("%s: ", prefix);
+    int first = 0;
+    do {
+        if (first++ != 0) printf(" -> ");
+        printf("%i", head->value);
+    } while (head = head->next);
+    printf("\n");
 }
