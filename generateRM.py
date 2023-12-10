@@ -13,7 +13,7 @@ content = [
 ]
 dirs = [f for f in os.listdir('.') if os.path.isdir(f) and f[0:3] == 'AoC']
 emojis = ['👼','🎅','🤶','🧑‍🎄','🧝','🧝‍♂️','🧝‍♀️','👪','🦌','🍪','🥛','🍷','🍴','⛪','🌟','❄️','☃️','⛄','🔥','🎄','🎁','🧦','🔔','🎶','🕯️','🛐','✝️']
-dirs.sort()
+dirs.sort(key=lambda s: int(s[3:]))
 content.append('| 🎄 | Day | Time | #1 | #2 |')
 content.append('| --- | --- | --- | --- | --- |')
 for i,dir in enumerate(dirs):

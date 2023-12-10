@@ -12,4 +12,5 @@ build:
 	AoC7/aoc7.c \
 	AoC8/aoc8.c \
 	AoC9/aoc9.c \
+	AoC10/aoc10.c \
 	-o aoc
