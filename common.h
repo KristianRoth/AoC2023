@@ -24,7 +24,7 @@ struct HashNode {
 typedef struct HashMap HashMap;
 struct HashMap {
     int bucket_count;
-    int (*hash_fn)(char*);
+    unsigned int (*hash_fn)(char*);
     HashNode* buckets[];
 };
 
@@ -40,11 +40,14 @@ unsigned long Common_get_number_lstrip_ul(char **str);
 long Common_concatenate(long x, long y);
 long Common_lcm(long x, long y);
 long Common_gcd(long x, long y);
-HashMap *Common_hash_create(int bucket_count, int (*hash_fn)(char*));
+HashMap *Common_hash_create(int bucket_count, unsigned int (*hash_fn)(char*));
 void Common_hash_put(HashMap *hm, char *key, void *data);
 void *Common_hash_get(HashMap *hm, char *key);
-int Common_hash_string(char *str);
+unsigned int Common_hash_string(char *str);
+void Common_hash_print(HashMap *hm);
+void Common_hash_free(HashMap *hm);
 void Common_int_node_print(IntNode *head, char *prefix);
+IntNode *Common_rec_get_int_node(char *str);
 
 
 #endif // COMMON_H

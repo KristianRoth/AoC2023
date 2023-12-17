@@ -21,8 +21,10 @@ Node *Common_readFile(const char* path) {
 
     while (fgets(buff, sizeof(buff), inputFile)) {
         next = (Node*)malloc(sizeof(Node));
-        next->value = (char*)malloc(strlen(buff));
-        strncpy(next->value, buff, strcspn(buff,"\n"));
+        int len = strlen(buff);
+        next->value = (char*)malloc(len);
+        memcpy(next->value, buff, len);
+        next->value[len-1] = '\0';
         prev->next = next;
         prev = next;
     }
@@ -103,7 +105,7 @@ long Common_gcd(long x, long y) {
     return x;
 }
 
-HashMap *Common_hash_create(int bucket_count, int (*hash_fn)(char*)) {
+HashMap *Common_hash_create(int bucket_count, unsigned int (*hash_fn)(char*)) {
     HashMap *hm = malloc(sizeof(int) + sizeof(void*) + sizeof(void*)*bucket_count);
     hm->bucket_count = bucket_count;
     hm->hash_fn = hash_fn;
@@ -114,7 +116,8 @@ HashMap *Common_hash_create(int bucket_count, int (*hash_fn)(char*)) {
 void Common_hash_put(HashMap *hm, char *key, void *data) {
     int hash = hm->hash_fn(key)%hm->bucket_count;
     HashNode *new = malloc(sizeof(HashNode));
-    new->key  = key;
+    new->key  = malloc(strlen(key)+1);
+    strcpy(new->key, key);
     new->data = data;
     new->next = hm->buckets[hash];
     hm->buckets[hash] = new;
@@ -127,11 +130,36 @@ void *Common_hash_get(HashMap *hm, char *key) {
     return bucket != NULL ? bucket->data : NULL;
 }
 
-int Common_hash_string(char *str) {
+unsigned int Common_hash_string(char *str) {
     int a = 112241;
     while (str != str + strlen(str)) a += (a << 5) + a + *(str++);
     return a;
 }
+
+void Common_hash_print(HashMap *hm) {
+    for (int i = 0; i < hm->bucket_count; i++) {
+        if( hm->buckets[i] != NULL)
+            printf("hash: %i %s %p\n", i, hm->buckets[i]->key, hm->buckets[i]->data);
+    }
+}
+
+void Common_hash_free_bucket(HashNode *node) {
+    if (node == NULL) {
+        return;
+    }
+    Common_hash_free_bucket(node->next);
+    free(node->data);
+    free(node->key);
+    free(node);
+}
+
+void Common_hash_free(HashMap *hm) {
+    for (int i = 0; i < hm->bucket_count; i++) {
+        Common_hash_free_bucket(hm->buckets[i]);
+    }
+    free(hm);
+}
+
 
 void Common_int_node_print(IntNode *head, char *prefix) {
     printf("%s: ", prefix);
@@ -141,4 +169,12 @@ void Common_int_node_print(IntNode *head, char *prefix) {
         printf("%i", head->value);
     } while (head = head->next);
     printf("\n");
+}
+
+IntNode *Common_rec_get_int_node(char *str) {
+    IntNode *new = malloc(sizeof(IntNode));
+    new->value = Common_get_number_lstrip(&str);
+    new->next = NULL;
+    if (*str != '\0') new->next = Common_rec_get_int_node(str);
+    return new;
 }
